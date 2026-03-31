@@ -50,7 +50,7 @@ A Stellar network decentralized application (dApp) built with Next.js and Tailwi
 <img width="1470" height="956" alt="Screenshot 2026-03-31 at 9 54 51 PM" src="https://github.com/user-attachments/assets/6964d841-7861-4680-a2a1-b876603f079d" />
 
 
-### 2. Balance Displayed ( Successful Testnet Transaction ) 
+### 2. Balance Displayed 
 
 <img width="1470" height="956" alt="Screenshot 2026-03-31 at 9 55 09 PM" src="https://github.com/user-attachments/assets/c7e84208-4b80-45ea-a2eb-f437d735aa22" />
 
