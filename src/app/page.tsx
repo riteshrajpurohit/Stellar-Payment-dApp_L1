@@ -1,113 +1,154 @@
-import Image from "next/image";
+"use client";
+
+import {
+  ArrowDownToLine,
+  ExternalLink,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
+
+import { ActivityCard } from "@/components/app/activity-card";
+import { AppHeader } from "@/components/app/app-header";
+import { FaucetHint } from "@/components/app/faucet-hint";
+import { TransactionForm } from "@/components/app/transaction-form";
+import { TxResultCard } from "@/components/app/tx-result-card";
+import { WalletPanel } from "@/components/app/wallet-panel";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useStellarWallet } from "@/hooks/use-stellar-wallet";
+import { shortenAddress } from "@/utils/format";
 
 export default function Home() {
+  const {
+    connectionState,
+    walletAddress,
+    isConnected,
+    isFreighterInstalled,
+    balance,
+    isBalanceLoading,
+    balanceError,
+    txStatus,
+    txError,
+    lastTx,
+    activity,
+    connectWallet,
+    disconnectWallet,
+    refreshBalance,
+    sendPayment,
+  } = useStellarWallet();
+
+  const isConnecting = connectionState === "connecting";
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <div className="min-h-screen">
+      <AppHeader
+        isConnected={isConnected}
+        walletAddress={walletAddress}
+        isConnecting={isConnecting}
+        onConnect={connectWallet}
+        onDisconnect={disconnectWallet}
+      />
+
+      <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-10 md:px-8 md:py-14">
+        <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 p-7 shadow-[0_25px_80px_rgba(2,6,23,0.45)] backdrop-blur-2xl md:p-10">
+          <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-cyan-400/15 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 bottom-0 size-48 rounded-full bg-blue-500/15 blur-3xl" />
+
+          <div className="relative z-10 max-w-3xl space-y-5">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/35 bg-cyan-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-cyan-100">
+              <ShieldCheck className="size-4" />
+              Stellar Testnet Live
+            </div>
+
+            <h1 className="text-3xl font-semibold leading-tight text-white md:text-5xl">
+              Stellar Testnet Payment Console
+            </h1>
+
+            <p className="max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">
+              Connect Freighter, inspect your current Testnet XLM balance, and
+              submit a real payment transaction with production-grade feedback,
+              validation, and explorer traceability.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                onClick={connectWallet}
+                disabled={isConnected || isConnecting}
+                className="bg-cyan-300 text-slate-950 hover:bg-cyan-200 disabled:bg-cyan-300/60"
+              >
+                <Wallet className="mr-2 size-4" />
+                {isConnected ? "Wallet Connected" : "Connect Freighter"}
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+              >
+                <a href="#send">
+                  <ArrowDownToLine className="mr-2 size-4" />
+                  Go to Send Transaction
+                </a>
+              </Button>
+            </div>
+
+            {!isFreighterInstalled ? (
+              <Card className="border-amber-400/25 bg-amber-500/10">
+                <CardContent className="flex flex-col gap-2 p-4 text-sm text-amber-100 md:flex-row md:items-center md:justify-between">
+                  <p>
+                    Freighter wallet was not detected in this browser. Install
+                    it to continue.
+                  </p>
+                  <a
+                    href="https://www.freighter.app"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center font-medium text-amber-50 underline decoration-amber-200/40 underline-offset-4"
+                  >
+                    Install Freighter
+                    <ExternalLink className="ml-1 size-4" />
+                  </a>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            {isConnected ? (
+              <p className="text-sm text-slate-300">
+                Connected wallet:{" "}
+                <span className="font-mono text-white">
+                  {shortenAddress(walletAddress, 12, 10)}
+                </span>
+              </p>
+            ) : null}
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <WalletPanel
+            isConnected={isConnected}
+            address={walletAddress}
+            balance={balance}
+            isBalanceLoading={isBalanceLoading}
+            balanceError={balanceError}
+            onRefreshBalance={() => void refreshBalance()}
+            onDisconnect={disconnectWallet}
+          />
+
+          <div className="space-y-6">
+            <TransactionForm
+              disabled={!isConnected}
+              isSubmitting={txStatus === "pending"}
+              onSubmit={sendPayment}
             />
-          </a>
-        </div>
-      </div>
+            <TxResultCard status={txStatus} error={txError} result={lastTx} />
+          </div>
+        </section>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+        <section className="grid gap-6 lg:grid-cols-2">
+          <FaucetHint />
+          <ActivityCard items={activity} />
+        </section>
+      </main>
+    </div>
   );
 }
