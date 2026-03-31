@@ -45,20 +45,13 @@ A Stellar network decentralized application (dApp) built with Next.js and Tailwi
 
 ## Screenshots
 
-_(Please replace the placeholder image links below with your actual screenshot paths)_
-
 ### 1. Wallet Connected State
 
-![Wallet Connected State](public/wallet-connected.png)
+<img width="1470" height="956" alt="Screenshot 2026-03-31 at 9 54 51 PM" src="https://github.com/user-attachments/assets/6964d841-7861-4680-a2a1-b876603f079d" />
 
-### 2. Balance Displayed
 
-![Balance Displayed](public/balance-displayed.png)
+### 2. Balance Displayed ( Successful Testnet Transaction ) 
 
-### 3. Successful Testnet Transaction
+<img width="1470" height="956" alt="Screenshot 2026-03-31 at 9 54 51 PM" src="https://github.com/user-attachments/assets/1fc7f2cd-2f66-4b6d-bb57-0742cbac729d" />
 
-![Successful Testnet Transaction](public/successful-transaction.png)
 
-### 4. The Transaction Result is Shown to the User
-
-![Transaction Result](public/transaction-result.png)
